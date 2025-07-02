@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Observations - Centrala Trust for Ornithology</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .post-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .post-user {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .post-date {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .post-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 10px 0;
+            max-height: 300px;
+            object-fit: cover;
+        }
+        .post-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .detail-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        .detail-value {
+            color: #2c3e50;
+        }
+        .post-comments {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .search-container {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .no-posts {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Centrala Trust for Ornithology</h1>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="post.html">New Observation</a></li>
+            <li><a href="view_posts.html">View Observations</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <h2>Bird Observations</h2>
+        
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search by bird species, location, activity...">
+            <button id="search-button" class="btn">Search</button>
+        </div>
+        
+        <div id="posts-container">
+            <div class="loading">
+                <p><i class="fas fa-spinner fa-spin"></i> Loading observations...</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Centrala Trust for Ornithology. All rights reserved.</p>
+    </footer>
+    
+    <script src="script.js"></script>
+    <script src="nav_script.js"></script>    
+    <script src="post.js"></script>
+
+</body>
+</html>

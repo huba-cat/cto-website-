@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Observation - Centrala Trust for Ornithology</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Centrala Trust for Ornithology</h1>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="post.html">New Observation</a></li>
+            <li><a href="view_posts.html">View Observations</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <div class="form-container">
+            <h2>Edit Bird Observation</h2>
+            <form id="edit-form" action="php/edit_post.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" id="post-id" name="post_id">
+                
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <select id="location" name="location" required>
+                        <option value="">Select a location</option>
+                        <option value="Erean">Erean</option>
+                        <option value="Brunad">Brunad</option>
+                        <option value="Bylyn">Bylyn</option>
+                        <option value="Docia">Docia</option>
+                        <option value="Marend">Marend</option>
+                        <option value="Pryn">Pryn</option>
+                        <option value="Zord">Zord</option>
+                        <option value="Yaean">Yaean</option>
+                        <option value="Frestin">Frestin</option>
+                        <option value="Stonyam">Stonyam</option>
+                        <option value="Ryall">Ryall</option>
+                        <option value="Ruril">Ruril</option>
+                        <option value="Keivia">Keivia</option>
+                        <option value="Tallan">Tallan</option>
+                        <option value="Adohad">Adohad</option>
+                        <option value="Obelyn">Obelyn</option>
+                        <option value="Holmer">Holmer</option>
+                        <option value="Vertwall">Vertwall</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="observation-time">Time of Observation:</label>
+                    <input type="time" id="observation-time" name="observation_time" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="observation-date">Date of Observation:</label>
+                    <input type="date" id="observation-date" name="observation_date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bird-species">Bird Species:</label>
+                    <select id="bird-species" name="bird_species" required>
+                        <option value="">Select a bird species</option>
+                        <option value="Wood Pigeon">Wood Pigeon</option>
+                        <option value="House Sparrow">House Sparrow</option>
+                        <option value="Starling">Starling</option>
+                        <option value="Blue Tit">Blue Tit</option>
+                        <option value="Blackbird">Blackbird</option>
+                        <option value="Robin">Robin</option>
+                        <option value="Goldfinch">Goldfinch</option>
+                        <option value="Magpie">Magpie</option>
+                        <option value="Other">Other/Unknown</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="activity">Primary Activity:</label>
+                    <select id="activity" name="activity" required>
+                        <option value="">Select an activity</option>
+                        <option value="Visit">Visit</option>
+                        <option value="Feeding">Feeding</option>
+                        <option value="Nesting">Nesting</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="duration">Duration of Observation (minutes):</label>
+                    <input type="number" id="duration" name="duration" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="comments">Comments:</label>
+                    <textarea id="comments" name="comments" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">Upload New Image (optional, max 1.2MB, .jpg or .png only):</label>
+                    <input type="file" id="image" name="image" accept=".jpg, .jpeg, .png">
+                </div>
+                
+                <div class="form-group" id="current-image-container">
+                    <label>Current Image:</label>
+                    <img id="current-image" src="" alt="Current image" style="max-width: 100%; max-height: 200px; display: none;">
+                    <p id="no-image-message" style="display: none;">No image uploaded</p>
+                </div>
+                
+                <button type="submit" class="btn">Update Observation</button>
+                <a href="view_posts.html" class="btn" style="background-color: #95a5a6; margin-left: 10px;">Cancel</a>
+            </form>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Centrala Trust for Ornithology. All rights reserved.</p>
+    </footer>
+    
+    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get post ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('id');
+            
+            if (!postId) {
+                // No post ID provided, redirect to view posts
+                window.location.href = 'view_posts.html';
+                return;
+            }
+            
+            // Set post ID in hidden field
+            document.getElementById('post-id').value = postId;
+            
+            // Fetch post data
+            fetch(`php/edit_post.php?id=${postId}`)
+                .then(response => response.json())
+                .then(post => {
+                    if (post.error) {
+                        alert(post.error);
+                        window.location.href = 'view_posts.html';
+                        return;
+                    }
+                    
+                    // Fill form with post data
+                    document.getElementById('location').value = post.location;
+                    document.getElementById('observation-time').value = post.observation_time;
+                    document.getElementById('observation-date').value = post.observation_date;
+                    document.getElementById('bird-species').value = post.bird_species;
+                    document.getElementById('activity').value = post.activity;
+                    document.getElementById('duration').value = post.duration;
+                    document.getElementById('comments').value = post.comments;
+                    
+                    // Display current image if exists
+                    const currentImage = document.getElementById('current-image');
+                    const noImageMessage = document.getElementById('no-image-message');
+                    
+                    if (post.image_path) {
+                        currentImage.src = post.image_path;
+                        currentImage.style.display = 'block';
+                        noImageMessage.style.display = 'none';
+                    } else {
+                        currentImage.style.display = 'none';
+                        noImageMessage.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error fetching post data');
+                    window.location.href = 'view_posts.html';
+                });
+                
+            // Validate form on submit
+            document.getElementById('edit-form').addEventListener('submit', function(e) {
+                const location = document.getElementById('location').value;
+                const observationTime = document.getElementById('observation-time').value;
+                const observationDate = document.getElementById('observation-date').value;
+                const birdSpecies = document.getElementById('bird-species').value;
+                const activity = document.getElementById('activity').value;
+                const duration = document.getElementById('duration').value;
+                
+                if (location === '') {
+                    alert('Please select a location');
+                    e.preventDefault();
+                    return;
+                }
+                
+                if (observationTime === '') {
+                    alert('Please enter observation time');
+                    e.preventDefault();
+                    return;
+                }
+                
+                if (observationDate === '') {
+                    alert('Please enter observation date');
+                    e.preventDefault();
+                    return;
+                }
+                
+                if (birdSpecies === '') {
+                    alert('Please select a bird species');
+                    e.preventDefault();
+                    return;
+                }
+                
+                if (activity === '') {
+                    alert('Please select an activity');
+                    e.preventDefault();
+                    return;
+                }
+                
+                if (duration === '' || duration <= 0) {
+                    alert('Please enter a valid duration');
+                    e.preventDefault();
+                    return;
+                }
+            });
+        });
+    </script>
+    <script src="nav_script.js"></script>
+</body>
+</html>
