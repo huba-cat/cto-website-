@@ -2,6 +2,8 @@
 session_start();
 require_once 'config.php';
 
+header('Content-Type: application/json');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -12,21 +14,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
-            // ✅ Set session variables
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-
-            echo "<script>alert('Login successful'); window.location.href='../post.html';</script>";
-            exit;
+            
+            echo json_encode([
+                'success' => true,
+                'redirect' => 'post.html'  // Relative path from root
+            ]);
         } else {
-            echo "<script>alert('Invalid username or password'); window.location.href='../login.html';</script>";
-            exit;
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid username or password'
+            ]);
         }
     } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
+        echo json_encode([
+            'success' => false,
+            'message' => 'Database error'
+        ]);
     }
 } else {
-    header("Location: ../login.html");
-    exit;
+    echo json_encode([
+        'success' => false,
+        'message' => 'Invalid request method'
+    ]);
 }
 ?>

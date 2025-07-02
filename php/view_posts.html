@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Observations - Centrala Trust for Ornithology</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Centrala Trust for Ornithology</h1>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="post.html">New Observation</a></li>
+            <li><a href="view_posts.html">View Observations</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <h2>Bird Observations</h2>
+        
+        <div id="posts-container">
+            <!-- Posts will be loaded here by JavaScript -->
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Centrala Trust for Ornithology. All rights reserved.</p>
+    </footer>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadPosts();
+        
+        function loadPosts(searchTerm = '') {
+            fetch('php/get_posts.php?search=' + encodeURIComponent(searchTerm))
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('posts-container').innerHTML = data;
+                });
+        }
+        
+        // Add search functionality if needed
+    });
+    </script>
+</body>
+</html>

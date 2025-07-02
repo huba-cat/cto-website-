@@ -20,6 +20,7 @@ function validateRegistration() {
     if (password !== confirmPassword) {
         alert('Passwords do not match');
         return false;
+        
     }
     
     if (!email.includes('@')) {

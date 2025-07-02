@@ -1,138 +1,60 @@
 <?php
-require_once 'php/config.php';
+session_start();
+require_once 'config.php';
+
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 
 try {
-    // Database connection
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Search functionality
-    $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
-
     if ($searchTerm) {
-        $stmt = $conn->prepare("
-            SELECT * FROM posts 
-            WHERE bird_species LIKE :search 
-               OR location LIKE :search 
-               OR activity LIKE :search 
-               OR comments LIKE :search
-            ORDER BY observation_date DESC, observation_time DESC
-        ");
-        $searchParam = "%$searchTerm%";
-        $stmt->bindParam(':search', $searchParam);
+        $searchTerm = "%$searchTerm%";
+        $stmt = $conn->prepare("SELECT * FROM posts 
+                               WHERE location LIKE ? OR 
+                                     bird_species LIKE ? OR 
+                                     activity LIKE ? OR 
+                                     comments LIKE ?
+                               ORDER BY created_at DESC");
+        $stmt->execute([$searchTerm, $searchTerm, $searchTerm, $searchTerm]);
     } else {
-        $stmt = $conn->prepare("SELECT * FROM posts ORDER BY observation_date DESC, observation_time DESC");
+        $stmt = $conn->prepare("SELECT * FROM posts ORDER BY created_at DESC");
+        $stmt->execute();
     }
-
-    $stmt->execute();
+    
     $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    foreach ($posts as $post) {
+        echo '<div class="post-card">';
+        echo '<div class="post-header">';
+        echo '<span class="post-user">' . htmlspecialchars($post['username']) . '</span>';
+        echo '<span class="post-date">' . htmlspecialchars($post['observation_date']) . ' ' . htmlspecialchars($post['observation_time']) . '</span>';
+        echo '</div>';
+        
+        if ($post['image_path']) {
+            echo '<img src="' . htmlspecialchars($post['image_path']) . '" class="post-image">';
+        }
+        
+        echo '<div class="post-details">';
+        echo '<div class="detail-item"><span class="detail-label">Location:</span> ' . htmlspecialchars($post['location']) . '</div>';
+        echo '<div class="detail-item"><span class="detail-label">Species:</span> ' . htmlspecialchars($post['bird_species']) . '</div>';
+        echo '<div class="detail-item"><span class="detail-label">Activity:</span> ' . htmlspecialchars($post['activity']) . '</div>';
+        echo '<div class="detail-item"><span class="detail-label">Duration:</span> ' . htmlspecialchars($post['duration']) . ' minutes</div>';
+        echo '</div>';
+        
+        if ($post['comments']) {
+            echo '<div class="post-comments">' . htmlspecialchars($post['comments']) . '</div>';
+        }
+        
+        // Add edit/delete buttons if the post belongs to the current user
+        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $post['user_id']) {
+            echo '<div class="action-buttons">';
+            echo '<a href="edit_post.html?id=' . $post['post_id'] . '" class="btn btn-edit">Edit</a>';
+            echo '<button onclick="deletePost(' . $post['post_id'] . ')" class="btn btn-delete">Delete</button>';
+            echo '</div>';
+        }
+        
+        echo '</div>';
+    }
+    
 } catch (PDOException $e) {
-    die("Error: " . $e->getMessage());
+    echo '<div class="error">Error loading posts: ' . htmlspecialchars($e->getMessage()) . '</div>';
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>View Observations - Centrala Trust for Ornithology</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #aaa;
-            padding: 10px;
-            text-align: center;
-        }
-        img {
-            max-width: 120px;
-            height: auto;
-        }
-        .search-container {
-            margin-bottom: 20px;
-        }
-        input[type="text"] {
-            padding: 8px;
-            width: 300px;
-        }
-        button {
-            padding: 8px 15px;
-            background: #3498db;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #2980b9;
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <h1>Centrala Trust for Ornithology</h1>
-</header>
-
-<nav>
-    <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="register.html">Register</a></li>
-        <li><a href="login.html">Login</a></li>
-        <li><a href="post.html">New Observation</a></li>
-        <li><a href="view_posts.php">View Observations</a></li>
-    </ul>
-</nav>
-
-<div class="container">
-    <h2>Bird Observations</h2>
-
-    <form method="get" class="search-container">
-        <input type="text" name="search" placeholder="Search by bird species, location, activity..." value="<?php echo htmlspecialchars($searchTerm); ?>">
-        <button type="submit">Search</button>
-    </form>
-
-    <?php if ($posts): ?>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Bird Species</th>
-                <th>Location</th>
-                <th>Activity</th>
-                <th>Observation Date</th>
-                <th>Observation Time</th>
-                <th>Comments</th>
-                <th>Image</th>
-            </tr>
-            <?php foreach ($posts as $post): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($post['id']); ?></td>
-                    <td><?php echo htmlspecialchars($post['bird_species']); ?></td>
-                    <td><?php echo htmlspecialchars($post['location']); ?></td>
-                    <td><?php echo htmlspecialchars($post['activity']); ?></td>
-                    <td><?php echo htmlspecialchars($post['observation_date']); ?></td>
-                    <td><?php echo htmlspecialchars($post['observation_time']); ?></td>
-                    <td><?php echo htmlspecialchars($post['comments'] ?: 'N/A'); ?></td>
-                    <td>
-                        <?php if (!empty($post['image_path'])): ?>
-                            <img src="<?php echo htmlspecialchars($post['image_path']); ?>" alt="Bird Image">
-                        <?php else: ?>
-                            No Image
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
-    <?php else: ?>
-        <p>No observations found.</p>
-    <?php endif; ?>
-</div>
-
-<footer>
-    <p>&copy; 2025 Centrala Trust for Ornithology. All rights reserved.</p>
-</footer>
-
-</body>
-</html>

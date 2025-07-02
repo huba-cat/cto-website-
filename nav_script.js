@@ -1,34 +1,37 @@
-// Function to update navigation based on login status
-function updateNavigation() {
-    // Check if user is logged in (by looking for a session cookie)
-    const isLoggedIn = document.cookie.includes('PHPSESSID');
-    
-    // Get all navigation elements
-    const navContainer = document.querySelector('nav ul');
-    
-    if (navContainer) {
-        // Clear existing navigation
-        navContainer.innerHTML = `
-            <li><a href="index.html">Home</a></li>
-        `;
-        
-        if (isLoggedIn) {
-            // User is logged in
-            navContainer.innerHTML += `
-                <li><a href="post.html">New Observation</a></li>
-                <li><a href="view_posts.html">View Observations</a></li>
-                <li><a href="php/logout.php">Logout</a></li>
-            `;
-        } else {
-            // User is not logged in
-            navContainer.innerHTML += `
-                <li><a href="register.html">Register</a></li>
-                <li><a href="login.html">Login</a></li>
-                <li><a href="view_posts.html">View Observations</a></li>
-            `;
-        }
-    }
-}
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('php/check_login.php')
+        .then(response => response.json())
+        .then(data => {
+            const nav = document.querySelector('nav ul');
+            if (nav) {
+                if (data.loggedIn) {
+                    // Add logout button
+                    const logoutItem = document.createElement('li');
+                    logoutItem.innerHTML = `<a href="#" id="logout-btn">Logout (${data.username})</a>`;
+                    nav.appendChild(logoutItem);
+                    
+                    // Add event listener for logout
+                    document.getElementById('logout-btn').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                    
+                    // Show post link
+                    document.querySelector('a[href="post.html"]').style.display = 'block';
+                } else {
+                    // Hide post link if not logged in
+                    document.querySelector('a[href="post.html"]').style.display = 'none';
+                }
+            }
+        });
+});
 
-// Call the function when the page loads
-document.addEventListener('DOMContentLoaded', updateNavigation);
+function logout() {
+    fetch('php/logout.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = 'index.html';
+            }
+        });
+}

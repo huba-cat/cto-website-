@@ -1,4 +1,6 @@
+
 <!DOCTYPE html>
+<html lang="en"><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -111,7 +113,21 @@
         <p>&copy; 2025 Centrala Trust for Ornithology. All rights reserved.</p>
     </footer>
     
-   <script src="script.js"></script>
-    <script src="nav_script.js"></script> 
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('php/check_auth.php');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    alert('Please login to access this page');
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = 'login.html';
+            }
+        });
+        </script>
 </body>
 </html>

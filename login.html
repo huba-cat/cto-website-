@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Centrala Trust for Ornithology</title>
+    <title>Centrala Trust for Ornithology</title>
     <link rel="stylesheet" href="style.css">
 </head><body>
     <header>
         <h1>Centrala Trust for Ornithology</h1>
+
+    
     </header>
     
     <nav>
@@ -24,6 +26,7 @@
         <div class="form-container">
             <h2>Login to Your Account</h2>
             <form id="login-form" action="php/login.php" method="POST">
+
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" required>
@@ -44,7 +47,51 @@
         <p>&copy; 2025 Centrala Trust for Ornithology. All rights reserved.</p>
     </footer>
     
-    <script src="script.js"></script>
-    <script src="nav_script.js"></script>
+  
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('login-form');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch('php/login.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        window.location.href = data.redirect;
+                    } else {
+                        showError(data.message || 'Login failed');
+                    }
+                } catch (error) {
+                    showError('Network error occurred');
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            function showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                
+                const existingError = form.querySelector('.error-message');
+                if (existingError) {
+                    existingError.replaceWith(errorDiv);
+                } else {
+                    form.prepend(errorDiv);
+                }
+            }
+        });
+        </script>
 </body>
 </html>
